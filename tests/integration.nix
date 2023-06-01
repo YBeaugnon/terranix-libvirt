@@ -8,49 +8,50 @@ let
     ];
   };
 
-  inherit (import (nixpkgs + "/nixos/tests/ssh-keys.nix") pkgs)
-    snakeOilPrivateKey snakeOilPublicKey;
-
   terraform = pkgs.terraform.withPlugins (p: [ p.libvirt ]);
 in
 {
   nodes.server_a = { config, pkgs, ... }: {
     virtualisation.libvirtd.enable = true;
     services.openssh.enable = true;
-    users.users.root.openssh.authorizedKeys.keys = [
-      snakeOilPublicKey
-    ];
+    security.polkit.enable = true;
+    environment.systemPackages = with pkgs; [ virt-manager ];
   };
   nodes.server_b = { config, pkgs, ... }: {
     virtualisation.libvirtd.enable = true;
     services.openssh.enable = true;
-    users.users.root.openssh.authorizedKeys.keys = [
-      snakeOilPublicKey
-    ];
-
+    security.polkit.enable = true;
+    environment.systemPackages = with pkgs; [ virt-manager ];
   };
 
-  nodes.client_a = { config, pkgs, ... }: { };
+  nodes.client = { config, pkgs, ... }: { };
 
   testScript = ''
-    # Start and wait for all machines
-    def setup():
-      # start all machines.
-      start_all()
-      server_a.wait_for_unit("default.target");
-      server_b.wait_for_unit("default.target");
-      client_a.wait_for_unit("default.target");
-      
-      # setup client.
-      client_a.succeed("ln -s ${config-tf} config.tf.json")
-      client_a.succeed("mkdir -p .ssh")
-      client_a.succeed("cat ${snakeOilPrivateKey} > .ssh/snakeoil")
-    
-    with subtest("setup"):
-      setup()
+    start_all()
 
-    with subtest("testing-provider"):
-      client_a.succeed("${terraform}/bin/terraform init")
-      client_a.succeed("${terraform}/bin/terraform apply")
+
+    client.succeed('mkdir -m 700 /root/.ssh')
+    client.succeed(
+      '${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f /root/.ssh/id_ed25519 -N ""'
+    )
+    public_key = client.succeed(
+      '${pkgs.openssh}/bin/ssh-keygen -y -f /root/.ssh/id_ed25519'
+    ).strip()
+
+    client.wait_for_unit("network.target")
+
+    for server in [server_a, server_b]:
+      server.succeed('mkdir -m 700 /root/.ssh')
+      server.succeed(f'echo "{public_key}" > /root/.ssh/authorized_keys')
+      server.wait_for_unit('sshd')
+      client.succeed(
+        f'ssh -o StrictHostKeyChecking=no {server.name} true'
+      )
+
+
+    client.succeed('cp ${config-tf} config.tf.json')
+    client.succeed('${terraform}/bin/terraform init')
+    client.succeed('${terraform}/bin/terraform plan')
+    client.succeed('${terraform}/bin/terraform apply -auto-approve')
   '';
 }

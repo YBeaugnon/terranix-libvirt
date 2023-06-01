@@ -13,6 +13,12 @@
     in
     {
       formatter = pkgs.nixpkgs-fmt;
+
+      devShell = pkgs.mkShell {
+        buildInputs = with pkgs; [
+          (terraform.withPlugins (p: [ p.libvirt ]))
+        ];
+      };
       packages.integrationsTests = nixos-lib.runTest {
         name = "integration";
         _module.args = { inherit terranix nixpkgs; system = "x86_64-linux"; };
