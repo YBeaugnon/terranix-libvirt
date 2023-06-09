@@ -2,6 +2,12 @@
 let
   cfg = config.libvirt;
 
+  diskModule = {
+    options.volume_id = mkOption {
+      type = types.str;
+    };
+  };
+
   domainModule = { name, ... }: {
     options.name = mkOption {
       type = types.str;
@@ -60,6 +66,13 @@ let
       default = "libvirt.default";
       description = mdDoc ''
         Which provider should be used for this ressource.
+      '';
+    };
+
+    options.disk = mkOption {
+      type = types.listOf (types.submodule diskModule);
+      description = mdDoc ''
+        A list of disk to be attached to the domain.
       '';
     };
   };

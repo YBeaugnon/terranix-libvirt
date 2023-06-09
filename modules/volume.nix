@@ -5,12 +5,12 @@ let
   volumeModule = { name, ... }: {
     options.name = mkOption {
       type = types.str;
-      default = name;
       description = mdDoc ''
         A unique name for the resource, required by libvirt.
         Changing this forces a new resource to be created.
       '';
     };
+    config.name = name;
 
     options.size = mkOption {
       type = types.nullOr types.ints.unsigned;
@@ -22,7 +22,8 @@ let
     };
 
     options.source = mkOption {
-      type = types.path;
+      type = types.nullOr types.path;
+      default = null;
       description = ''
         Optional, the path to the image that will copied to create this volume.
         The source must either be a local path or a https uri.
@@ -36,6 +37,14 @@ let
         Which provider should be used for this ressource.
       '';
     };
+
+    options.id = mkOption {
+      type = types.str;
+      description = ''
+        The variable usable as reference to the id of this ressource.
+      '';
+    };
+    config.id = "\${libvirt_volume.${name}.id}";
   };
 in
 {
@@ -43,5 +52,10 @@ in
     type = types.attrsOf (types.submodule volumeModule);
   };
 
-  config.resource.libvirt_volume = cfg.volumes;
+  config.resource.libvirt_volume = mapAttrs (name: volume: {
+    name = volume.name;
+    size = volume.size;
+    source = volume.source;
+    provider = volume.provider;
+  }) cfg.volumes;
 }
