@@ -5,8 +5,10 @@
     flake-utils.url = "github:numtide/flake-utils";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     terranix.url = "github:terranix/terranix";
+    nixos-generators.url = "github:nix-community/nixos-generators";
   };
-  outputs = { self, flake-utils, nixpkgs, terranix }: flake-utils.lib.eachDefaultSystem (system:
+
+  outputs = { self, flake-utils, nixpkgs, terranix, nixos-generators, ... }: flake-utils.lib.eachDefaultSystem (system:
     let
       pkgs = import nixpkgs { inherit system; };
       nixos-lib = import (nixpkgs + "/nixos/lib") { };
@@ -26,12 +28,22 @@
         hostPkgs = pkgs;
       };
 
-      packages.exampleOutput = terranix.lib.terranixConfiguration {
-        inherit system;
-        modules = [
-          ./modules/default.nix
-          ./tests/config.nix
-        ];
-      };
+      packages.example =
+        let
+          nixos-base = nixos-generators.nixosGenerate {
+            inherit system;
+            modules = [ ];
+            format = "qcow";
+          };
+          images = { inherit nixos-base; };
+        in
+        terranix.lib.terranixConfiguration {
+          inherit system;
+          modules = [
+            { _module.args = { inherit images; }; }
+            ./modules/default.nix
+            ./examples/default.nix
+          ];
+        };
     });
 }

@@ -1,3 +1,4 @@
 result
-.terraform
-terraform
+.terraform*
+terraform*
+config.tf.json

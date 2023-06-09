@@ -22,7 +22,7 @@ let
     };
 
     options.source = mkOption {
-      type = types.str;
+      type = types.path;
       description = ''
         Optional, the path to the image that will copied to create this volume.
         The source must either be a local path or a https uri.
