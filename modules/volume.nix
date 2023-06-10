@@ -2,7 +2,7 @@
 let
   cfg = config.libvirt;
 
-  volumeModule = { name, ... }: {
+  volumeModule = { name, config, ... }: {
     options.name = mkOption {
       type = types.str;
       description = mdDoc ''
@@ -26,7 +26,7 @@ let
       default = null;
       description = ''
         Optional, the path to the image that will copied to create this volume.
-        The source must either be a local path or a https uri.
+        The source must be a local path.
       '';
     };
 
