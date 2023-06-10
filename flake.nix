@@ -21,29 +21,19 @@
           (terraform.withPlugins (p: [ p.libvirt ]))
         ];
       };
-      packages.integrationsTests = nixos-lib.runTest {
-        name = "integration";
-        _module.args = { inherit terranix nixpkgs; system = "x86_64-linux"; };
-        imports = [ ./tests/integration.nix ];
-        hostPkgs = pkgs;
-      };
 
-      packages.example =
+      packages =
         let
-          nixos-base = nixos-generators.nixosGenerate {
+          examples = import ./examples {
+            inherit pkgs;
+            inherit terranix;
+            inherit nixos-generators;
             inherit system;
-            modules = [ ];
-            format = "qcow";
+            inherit nixpkgs;
           };
-          images = { inherit nixos-base; };
         in
-        terranix.lib.terranixConfiguration {
-          inherit system;
-          modules = [
-            { _module.args = { inherit images; }; }
-            ./modules/default.nix
-            ./examples/default.nix
-          ];
+        {
+          inherit (examples) local_deployment;
         };
     });
 }

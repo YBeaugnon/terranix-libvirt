@@ -1,16 +1,21 @@
-{ config, pkgs, images, ... }: with pkgs; let
-  cfg = config.libvirt;
+{ nixpkgs, pkgs, terranix, nixos-generators, system, ... }: with pkgs; let
+  nixos-base = nixos-generators.nixosGenerate {
+    inherit system;
+    modules = [
+      "${nixpkgs}/nixos/modules/profiles/minimal.nix"
+      ./config.nix
+    ];
+    format = "qcow";
+  };
+  images = { inherit nixos-base; };
 in
 {
-  libvirt.providers.default.uri = "qemu:///system";
-
-  libvirt.volumes.nixos = {
-    source = "${images.nixos-base}/nixos.qcow2";
-  };
-
-  libvirt.domains.vm-test = {
-    disks = [
-      { volume_id = cfg.volumes.nixos.id; }
+  local_deployment = terranix.lib.terranixConfiguration {
+    inherit system;
+    modules = [
+      ../modules
+      ./infra.nix
+      { _module.args = { inherit images; }; }
     ];
   };
 }
