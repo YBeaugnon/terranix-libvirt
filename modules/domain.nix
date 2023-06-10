@@ -11,12 +11,12 @@ let
   domainModule = { name, ... }: {
     options.name = mkOption {
       type = types.str;
-      default = name;
       description = mdDoc ''
         A unique name for the resource, required by libvirt.
         Changing this forces a new resource to be created.
       '';
     };
+    config.name = name;
 
     options.description = mkOption {
       type = types.nullOr types.str;
@@ -69,12 +69,17 @@ let
       '';
     };
 
-    options.disk = mkOption {
+    options.disks = mkOption {
       type = types.listOf (types.submodule diskModule);
       description = mdDoc ''
         A list of disk to be attached to the domain.
       '';
     };
+
+    options.id = mkOption {
+      type = types.str;
+    };
+    config.id = "\${libvirt_domain.${name}.id}";
   };
 
 in
@@ -87,8 +92,15 @@ in
     '';
   };
   config.resource.libvirt_domain = mapAttrs
-    (name: domain:
-      domain
-    )
+    (name: domain: {
+      name = domain.name;
+      description = domain.description;
+      vcpu = domain.vcpu;
+      memory = domain.memory;
+      running = domain.running;
+      autostart = domain.autostart;
+      disk = domain.disks;
+      provider = domain.provider;
+    })
     cfg.domains;
 }

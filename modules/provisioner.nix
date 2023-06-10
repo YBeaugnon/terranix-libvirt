@@ -20,9 +20,10 @@ in
   };
 
   config.provider.libvirt = mapAttrsToList
-    (alias: provider:
-      provider // { inherit alias; }
-    )
+    (alias: provider: {
+      uri = provider.uri;
+      alias = alias;
+    })
     cfg.providers;
 
   config.terraform.required_providers.libvirt.source = "dmacvicar/libvirt";

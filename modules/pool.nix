@@ -5,11 +5,11 @@ let
   poolModule = { name, ... }: {
     options.name = mkOption {
       type = types.str;
-      default = name;
       description = ''
         Unique name for the ressource, required by libvirt.
       '';
     };
+    config.name = name;
 
     options.type = mkOption {
       type = types.str;
@@ -36,6 +36,12 @@ let
         Which provider should be used for this ressource.
       '';
     };
+
+    options.id = mkOption {
+      type = types.str;
+    };
+    config.id = "\${libvirt_pool.${name}.id}";
+
   };
 in
 {
@@ -47,5 +53,13 @@ in
     '';
   };
 
-  config.resource.libvirt_pool = cfg.pools;
+  config.resource.libvirt_pool = mapAttrs
+    (name: pool: {
+      name = pool.name;
+      description = pool.description;
+      type = pool.type;
+      path = pool.path;
+      provider = pool.provider;
+    })
+    cfg.pools;
 }

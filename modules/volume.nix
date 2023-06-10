@@ -52,10 +52,12 @@ in
     type = types.attrsOf (types.submodule volumeModule);
   };
 
-  config.resource.libvirt_volume = mapAttrs (name: volume: {
-    name = volume.name;
-    size = volume.size;
-    source = volume.source;
-    provider = volume.provider;
-  }) cfg.volumes;
+  config.resource.libvirt_volume = mapAttrs
+    (name: volume: {
+      name = volume.name;
+      size = volume.size;
+      source = volume.source;
+      provider = volume.provider;
+    })
+    cfg.volumes;
 }

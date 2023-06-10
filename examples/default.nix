@@ -1,6 +1,7 @@
 { config, pkgs, images, ... }: with pkgs; let
   cfg = config.libvirt;
-in {
+in
+{
   libvirt.providers.default.uri = "qemu:///system";
 
   libvirt.volumes.nixos = {
@@ -8,8 +9,8 @@ in {
   };
 
   libvirt.domains.vm-test = {
-    disk = [
-      {volume_id = cfg.volumes.nixos.id;}
+    disks = [
+      { volume_id = cfg.volumes.nixos.id; }
     ];
   };
 }
