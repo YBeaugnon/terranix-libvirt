@@ -12,5 +12,8 @@ in
     disks = [
       { volume_id = cfg.volumes.nixos.id; }
     ];
+    fileSystems = [
+      { source = "/tmp"; target = "tmp"; }
+    ];
   };
 }

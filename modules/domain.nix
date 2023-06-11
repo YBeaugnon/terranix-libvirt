@@ -19,6 +19,21 @@ let
     };
   };
 
+  fileSystemModule = {
+    options.source = mkOption {
+      type = types.str;
+    };
+
+    options.target = mkOption {
+      type = types.str;
+    };
+
+    options.readonly = mkOption {
+      type = types.bool;
+      default = true;
+    };
+  };
+
   domainModule = { name, ... }: {
     options.name = mkOption {
       type = types.str;
@@ -85,6 +100,15 @@ let
       description = mdDoc ''
         A list of disk to be attached to the domain.
       '';
+      default = [ ];
+    };
+
+    options.fileSystems = mkOption {
+      type = types.listOf (types.submodule fileSystemModule);
+      description = mdDoc ''
+        A list of file system to be passed as 9p virtio-fs.
+      '';
+      default = [ ];
     };
 
     options.id = mkOption {
@@ -112,6 +136,7 @@ in
       running = domain.running;
       autostart = domain.autostart;
       disk = domain.disks;
+      filesystem = domain.fileSystems;
       provider = domain.provider;
     })
     cfg.domains;
