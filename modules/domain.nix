@@ -4,7 +4,18 @@ let
 
   diskModule = {
     options.volume_id = mkOption {
-      type = types.str;
+      type = types.nullOr types.str;
+      default = null;
+    };
+
+    options.block_device = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+    };
+
+    options.scsi = mkOption {
+      type = types.bool;
+      default = true;
     };
   };
 
@@ -91,6 +102,7 @@ in
       A set of libvirt domains.
     '';
   };
+
   config.resource.libvirt_domain = mapAttrs
     (name: domain: {
       name = domain.name;
