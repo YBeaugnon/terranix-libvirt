@@ -16,4 +16,8 @@ in
       { source = "/tmp"; target = "tmp"; }
     ];
   };
+
+  libvirt.networks.net-test = {
+    mode = "none";
+  };
 }
