@@ -15,9 +15,13 @@ in
     fileSystems = [
       { source = "/tmp"; target = "tmp"; }
     ];
+    networkInterfaces = [
+      { network_id = cfg.networks.net-test.id;}
+    ];
   };
 
   libvirt.networks.net-test = {
-    mode = "none";
+    mode = "nat";
+    addresses = ["10.0.0.1/24"];
   };
 }

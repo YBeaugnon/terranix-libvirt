@@ -18,6 +18,38 @@ let
       default = true;
     };
   };
+  
+  networkInterfaceModule = {
+    options.network_id = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+    };
+
+    options.network_name = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+    };
+
+    options.addresses = mkOption {
+      type = types.nullOr (types.listOf types.str);
+      default = [];
+    };
+
+    options.hostname = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+    };
+
+    options.mac = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+    };
+
+    options.wait_for_lease = mkOption {
+      type = types.bool;
+      default = false;
+    };
+  };
 
   fileSystemModule = {
     options.source = mkOption {
@@ -111,6 +143,11 @@ let
       default = [ ];
     };
 
+    options.networkInterfaces = mkOption {
+      type = types.listOf (types.submodule networkInterfaceModule);
+      default = [];
+    };
+
     options.id = mkOption {
       type = types.str;
     };
@@ -137,6 +174,7 @@ in
       autostart = domain.autostart;
       disk = domain.disks;
       filesystem = domain.fileSystems;
+      network_interface = domain.networkInterfaces;
       provider = domain.provider;
     })
     cfg.domains;

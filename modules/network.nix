@@ -32,6 +32,14 @@ let
       type = types.str;
       default = "libvirt.default";
     };
+    options.id = mkOption {
+      type = types.str;
+      description = ''
+        The variable usable as reference to the id of this ressource.
+      '';
+    };
+    config.id = "\${libvirt_network.${name}.id}";
+
   };
 in {
   options.libvirt.networks = mkOption {
