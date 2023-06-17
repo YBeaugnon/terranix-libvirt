@@ -16,12 +16,12 @@ in
       { source = "/tmp"; target = "tmp"; }
     ];
     networkInterfaces = [
-      { network_id = cfg.networks.net-test.id;}
+      { network_id = cfg.networks.net-test.id; }
     ];
   };
 
   libvirt.networks.net-test = {
     mode = "nat";
-    addresses = ["10.0.0.1/24"];
+    addresses = [ "10.0.0.1/24" ];
   };
 }

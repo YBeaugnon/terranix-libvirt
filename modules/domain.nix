@@ -18,7 +18,7 @@ let
       default = true;
     };
   };
-  
+
   networkInterfaceModule = {
     options.network_id = mkOption {
       type = types.nullOr types.str;
@@ -32,7 +32,7 @@ let
 
     options.addresses = mkOption {
       type = types.nullOr (types.listOf types.str);
-      default = [];
+      default = [ ];
     };
 
     options.hostname = mkOption {
@@ -145,7 +145,7 @@ let
 
     options.networkInterfaces = mkOption {
       type = types.listOf (types.submodule networkInterfaceModule);
-      default = [];
+      default = [ ];
     };
 
     options.id = mkOption {

@@ -1,8 +1,8 @@
-{config, lib, ...}: with lib;
+{ config, lib, ... }: with lib;
 let
   cfg = config.libvirt;
 
-  networkModule = {name, ...}: {
+  networkModule = { name, ... }: {
     options.name = mkOption {
       type = types.str;
     };
@@ -10,11 +10,11 @@ let
 
     options.addresses = mkOption {
       type = types.listOf (types.str);
-      default = [];
+      default = [ ];
     };
 
     options.mode = mkOption {
-      type = types.enum ["none" "nat" "route" "open" "bridge"];
+      type = types.enum [ "none" "nat" "route" "open" "bridge" ];
       default = "nat";
     };
 
@@ -41,18 +41,21 @@ let
     config.id = "\${libvirt_network.${name}.id}";
 
   };
-in {
+in
+{
   options.libvirt.networks = mkOption {
     type = types.attrsOf (types.submodule networkModule);
-    default = {};
+    default = { };
   };
 
-  config.resource.libvirt_network = mapAttrs (name: network: {
-    name = network.name;
-    addresses = network.addresses;
-    mode = network.mode;
-    bridge = network.bridge;
-    autostart = network.autostart;
-    provider = network.provider;
-  }) cfg.networks;
+  config.resource.libvirt_network = mapAttrs
+    (name: network: {
+      name = network.name;
+      addresses = network.addresses;
+      mode = network.mode;
+      bridge = network.bridge;
+      autostart = network.autostart;
+      provider = network.provider;
+    })
+    cfg.networks;
 }
