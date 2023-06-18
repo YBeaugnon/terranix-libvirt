@@ -50,6 +50,7 @@ in
 {
   options.libvirt.volumes = mkOption {
     type = types.attrsOf (types.submodule volumeModule);
+    default = {};
   };
 
   config.resource.libvirt_volume = mapAttrs

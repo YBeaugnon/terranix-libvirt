@@ -17,6 +17,7 @@ in
 {
   options.libvirt.providers = lib.mkOption {
     type = types.attrsOf (types.submodule providerModule);
+    default = {};
   };
 
   config.provider.libvirt = mapAttrsToList
