@@ -55,7 +55,8 @@ in
 
   config.resource.libvirt_volume = mapAttrs
     (name: volume: {
-      name = volume.name;
+      name = mkIf (volume.source != null)
+        "${builtins.hashString "sha256" volume.source}-${volume.name}";
       size = volume.size;
       source = volume.source;
       provider = volume.provider;
