@@ -49,6 +49,16 @@ let
       type = types.bool;
       default = false;
     };
+
+    options.bridge = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+    };
+
+    options.macvtap = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+    };
   };
 
   fileSystemModule = {
